@@ -10,20 +10,19 @@
             padding: 0;
             background-color: #f5f5f5;
             font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
         }
         .container {
-            width: 90%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
         h1 {
             color: #333;
             text-align: center;
             font-weight: 300;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .search-box {
             display: flex;
@@ -50,37 +49,42 @@
         button:hover {
             background-color: #3367d6;
         }
+        .content {
+            display: flex;
+        }
         .results {
+            width: 300px;
+            margin-right: 20px;
+        }
+        .result-item {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        .result-item {
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-        }
-        .result-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+            padding: 15px;
+            margin-bottom: 15px;
         }
         .result-item h3 {
             color: #1a0dab;
             margin: 0 0 10px 0;
+            font-size: 16px;
         }
         .result-item p {
             color: #545454;
             margin: 0;
             line-height: 1.5;
+            font-size: 14px;
             white-space: pre-wrap;
         }
         #loading {
             text-align: center;
             display: none;
+        }
+        #summary {
+            flex-grow: 1;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
         }
     </style>
 </head>
@@ -92,7 +96,10 @@
             <button onclick="performSearch()">Search</button>
         </div>
         <div id="loading">Searching and summarizing...</div>
-        <div class="results" id="results"></div>
+        <div class="content">
+            <div class="results" id="results"></div>
+            <div id="summary"></div>
+        </div>
     </div>
 
     <script>
@@ -100,9 +107,11 @@
             const research = document.getElementById('research').value;
             const loadingDiv = document.getElementById('loading');
             const resultsDiv = document.getElementById('results');
+            const summaryDiv = document.getElementById('summary');
 
             loadingDiv.style.display = 'block';
             resultsDiv.innerHTML = '';
+            summaryDiv.innerHTML = '';
 
             fetch('http://127.0.0.1:5000/search', {
                 method: 'POST',
@@ -117,7 +126,10 @@
                 for (const [url, content] of Object.entries(data)) {
                     const resultItem = document.createElement('div');
                     resultItem.className = 'result-item';
-                    resultItem.innerHTML = `<h3><a href="${url}" target="_blank">${url}</a></h3><p>${content}</p>`;
+                    resultItem.innerHTML = `<h3><a href="${url}" target="_blank">${url}</a></h3>`;
+                    resultItem.addEventListener('click', () => {
+                        summaryDiv.innerHTML = `<h2>${url}</h2><p>${content}</p>`;
+                    });
                     resultsDiv.appendChild(resultItem);
                 }
             })
